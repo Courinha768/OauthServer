@@ -40,7 +40,12 @@
 
     <properties>
         <java.version>25</java.version>
-        <archunit.version>1.4.0</archunit.version>
+        <!--
+          Must be a release that understands the JDK's class file version. ArchUnit 1.4.0
+          silently imports zero classes from Java 25 bytecode (major version 69), which makes
+          every rule fail as "empty" rather than as a violation.
+        -->
+        <archunit.version>1.5.1</archunit.version>
     </properties>
 
     <dependencyManagement>
