@@ -29,11 +29,12 @@
                                     <excludes>
                                         <exclude>org.springframework*:*</exclude>
                                         <exclude>jakarta*:*</exclude>
-                                        <exclude>org.projectlombok:*</exclude>
                                     </excludes>
                                     <message>
                                         oauth2-domain must stay free of framework dependencies. If a type here
-                                        needs Spring, jakarta.* or Lombok, it belongs in an outer module.
+                                        needs Spring or jakarta.*, it belongs in an outer module.
+                                        Lombok is permitted: it is a compile-time processor with provided
+                                        scope, so it leaves no trace in the runtime classpath.
                                     </message>
                                 </bannedDependencies>
                             </rules>

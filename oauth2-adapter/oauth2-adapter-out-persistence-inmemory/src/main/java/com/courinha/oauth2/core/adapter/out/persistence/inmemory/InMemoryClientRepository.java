@@ -17,15 +17,20 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class InMemoryClientRepository implements ClientRepository {
 
-    private final ConcurrentMap<ClientId, Client> clients = new ConcurrentHashMap<>();
+    /**
+     * Keyed by the identifier's {@code String} rather than by {@link ClientId} itself:
+     * {@code ClientId} is mutable and derives its {@code hashCode} from its value, so using it
+     * as a key would let an in-place mutation orphan an entry.
+     */
+    private final ConcurrentMap<String, Client> clients = new ConcurrentHashMap<>();
 
     public void add(Client client) {
-        clients.put(client.id(), client);
+        clients.put(client.getId().getValue(), client);
     }
 
     @Override
     public Optional<Client> findByClientId(ClientId clientId) {
-        return Optional.ofNullable(clients.get(clientId));
+        return Optional.ofNullable(clients.get(clientId.getValue()));
     }
 
     public int size() {

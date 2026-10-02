@@ -2,6 +2,10 @@ package com.courinha.oauth2.core.domain.token;
 
 import com.courinha.oauth2.core.domain.client.ClientId;
 import com.courinha.oauth2.core.domain.scope.ScopeSet;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -13,24 +17,34 @@ import java.util.Objects;
  * <p>Note what this type does <em>not</em> carry: a refresh token. RFC 6749 §4.4.3 says a
  * refresh token SHOULD NOT accompany the client credentials grant, and the cleanest way to
  * honour that is for the concept to be absent from the model rather than always null. A test
- * asserts the component set below to keep it that way.
- *
- * @param value     the token string handed to the client — the one field that must never be logged
- * @param clientId  the client this token was issued to
- * @param scopes    the scopes actually granted, which may differ from those requested
- * @param tokenType always {@link TokenType#BEARER} today
- * @param issuedAt  when the token was minted
- * @param expiresAt when it stops being valid
+ * asserts the field set below to keep it that way.
  */
-public record AccessToken(
-        String value,
-        ClientId clientId,
-        ScopeSet scopes,
-        TokenType tokenType,
-        Instant issuedAt,
-        Instant expiresAt) {
+@Data
+@NoArgsConstructor
+public class AccessToken {
 
-    public AccessToken {
+    /** Excluded from {@code toString()}: this is the token itself. */
+    @ToString.Exclude
+    private String value;
+
+    private ClientId clientId;
+
+    /** The scopes actually granted, which may differ from those requested. */
+    private ScopeSet scopes;
+
+    private TokenType tokenType;
+
+    private Instant issuedAt;
+
+    private Instant expiresAt;
+
+    @Builder
+    public AccessToken(String value,
+                       ClientId clientId,
+                       ScopeSet scopes,
+                       TokenType tokenType,
+                       Instant issuedAt,
+                       Instant expiresAt) {
         Objects.requireNonNull(value, "value");
         Objects.requireNonNull(clientId, "clientId");
         Objects.requireNonNull(scopes, "scopes");
@@ -44,6 +58,13 @@ public record AccessToken(
         if (!expiresAt.isAfter(issuedAt)) {
             throw new IllegalArgumentException("expiresAt must be after issuedAt");
         }
+
+        this.value = value;
+        this.clientId = clientId;
+        this.scopes = scopes;
+        this.tokenType = tokenType;
+        this.issuedAt = issuedAt;
+        this.expiresAt = expiresAt;
     }
 
     /** The lifetime in whole seconds, as the {@code expires_in} response member reports it. */

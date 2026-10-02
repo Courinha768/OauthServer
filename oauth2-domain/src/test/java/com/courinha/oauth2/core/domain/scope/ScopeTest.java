@@ -15,7 +15,7 @@ class ScopeTest {
     @ParameterizedTest
     @ValueSource(strings = {"read", "Read", "write", "a", "!", "~", "[", "]", "read:write", "a.b.c", "*", "%20"})
     void acceptsTokensWithinTheGrammar(String token) {
-        assertThat(new Scope(token).value()).isEqualTo(token);
+        assertThat(new Scope(token).getValue()).isEqualTo(token);
     }
 
     @ParameterizedTest

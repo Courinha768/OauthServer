@@ -43,7 +43,7 @@ class ScopePolicyTest {
     void refusesToEscalateBeyondTheRegisteredScopes() {
         assertThatThrownBy(() -> ScopePolicy.resolve(CLIENT, ScopeSet.of("read", "admin")))
                 .isInstanceOf(OAuth2Exception.class)
-                .extracting(e -> ((OAuth2Exception) e).code())
+                .extracting(e -> ((OAuth2Exception) e).getCode())
                 .isEqualTo(OAuth2ErrorCode.INVALID_SCOPE);
     }
 

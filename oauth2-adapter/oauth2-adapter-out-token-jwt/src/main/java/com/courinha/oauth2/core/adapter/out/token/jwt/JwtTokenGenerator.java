@@ -36,11 +36,11 @@ public final class JwtTokenGenerator implements AccessTokenGenerator {
 
         Map<String, Object> claims = new LinkedHashMap<>();
         claims.put("iss", issuer);
-        claims.put("sub", request.clientId().value());
-        claims.put("client_id", request.clientId().value());
-        claims.put("scope", request.scopes().asSpaceDelimited());
-        claims.put("iat", request.issuedAt().getEpochSecond());
-        claims.put("exp", request.expiresAt().getEpochSecond());
+        claims.put("sub", request.getClientId().getValue());
+        claims.put("client_id", request.getClientId().getValue());
+        claims.put("scope", request.getScopes().asSpaceDelimited());
+        claims.put("iat", request.getIssuedAt().getEpochSecond());
+        claims.put("exp", request.getExpiresAt().getEpochSecond());
         claims.put("jti", UUID.randomUUID().toString());
         // No 'aud': there is no resource server registered yet, and inventing an audience would
         // be worse than omitting one.

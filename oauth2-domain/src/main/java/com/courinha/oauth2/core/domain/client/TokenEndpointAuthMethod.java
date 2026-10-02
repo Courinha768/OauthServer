@@ -1,5 +1,7 @@
 package com.courinha.oauth2.core.domain.client;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -9,6 +11,7 @@ import java.util.Optional;
  * <p>Only the two {@code client_secret_*} methods are modelled: the server issues client
  * passwords and, per §2.3.1, must support HTTP Basic for any client holding one.
  */
+@Getter
 public enum TokenEndpointAuthMethod {
 
     /** Credentials in the {@code Authorization} header, form-encoded then Base64 (§2.3.1). */
@@ -27,10 +30,6 @@ public enum TokenEndpointAuthMethod {
 
     TokenEndpointAuthMethod(String wireValue) {
         this.wireValue = wireValue;
-    }
-
-    public String wireValue() {
-        return wireValue;
     }
 
     public static Optional<TokenEndpointAuthMethod> fromWire(String value) {

@@ -1,5 +1,7 @@
 package com.courinha.oauth2.core.domain.error;
 
+import lombok.Getter;
+
 /**
  * The error codes RFC 6749 §5.2 defines for the token endpoint.
  *
@@ -12,6 +14,7 @@ package com.courinha.oauth2.core.domain.error;
  * <p>This type carries no HTTP status. Mapping a code to a status code and headers is the web
  * adapter's job, so the domain stays free of transport concerns.
  */
+@Getter
 public enum OAuth2ErrorCode {
 
     /** The request is missing a required parameter, or is otherwise malformed. §5.2 */
@@ -32,14 +35,10 @@ public enum OAuth2ErrorCode {
     /** The requested scope is invalid, unknown, malformed, or exceeds what was granted. §5.2 */
     INVALID_SCOPE("invalid_scope");
 
+    /** The literal value that appears as the {@code error} member of the JSON response body. */
     private final String wireValue;
 
     OAuth2ErrorCode(String wireValue) {
         this.wireValue = wireValue;
-    }
-
-    /** The literal value that appears as the {@code error} member of the JSON response body. */
-    public String wireValue() {
-        return wireValue;
     }
 }

@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public final class FakeClientRepository implements ClientRepository {
 
-    private final Map<ClientId, Client> clients = new HashMap<>();
+    private final Map<String, Client> clients = new HashMap<>();
 
     public FakeClientRepository with(Client client) {
-        clients.put(client.id(), client);
+        clients.put(client.getId().getValue(), client);
         return this;
     }
 
@@ -23,6 +23,6 @@ public final class FakeClientRepository implements ClientRepository {
 
     @Override
     public Optional<Client> findByClientId(ClientId clientId) {
-        return Optional.ofNullable(clients.get(clientId));
+        return Optional.ofNullable(clients.get(clientId.getValue()));
     }
 }

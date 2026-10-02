@@ -34,4 +34,8 @@ public final class RecordingAccessTokenRepository implements AccessTokenReposito
         }
         return saved.get(saved.size() - 1);
     }
+
+    public boolean hasSavedAnything() {
+        return !saved.isEmpty();
+    }
 }

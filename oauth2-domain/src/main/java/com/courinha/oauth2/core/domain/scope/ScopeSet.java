@@ -1,23 +1,32 @@
 package com.courinha.oauth2.core.domain.scope;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * An immutable, insertion-ordered set of {@link Scope}s.
+ * A set of {@link Scope}s, insertion-ordered.
  *
  * <p>Order is preserved because the set is rendered back to the client as a space-delimited
  * string, and echoing the requested order keeps responses stable and diffable.
  */
-public record ScopeSet(Set<Scope> scopes) {
+@Data
+@NoArgsConstructor
+public class ScopeSet {
 
-    public ScopeSet {
+    private Set<Scope> scopes = new LinkedHashSet<>();
+
+    /** Copies defensively, so the caller's collection cannot mutate this set behind its back. */
+    @Builder
+    public ScopeSet(Set<Scope> scopes) {
         Objects.requireNonNull(scopes, "scopes");
-        scopes = Collections.unmodifiableSet(new LinkedHashSet<>(scopes));
+        this.scopes = new LinkedHashSet<>(scopes);
     }
 
     public static ScopeSet empty() {
@@ -62,12 +71,12 @@ public record ScopeSet(Set<Scope> scopes) {
 
     /** True when every scope in {@code other} is present here. */
     public boolean containsAll(ScopeSet other) {
-        return scopes.containsAll(other.scopes());
+        return scopes.containsAll(other.getScopes());
     }
 
     /** Renders the set in the wire format the {@code scope} response member uses. */
     public String asSpaceDelimited() {
-        return scopes.stream().map(Scope::value).collect(Collectors.joining(" "));
+        return scopes.stream().map(Scope::getValue).collect(Collectors.joining(" "));
     }
 
     @Override

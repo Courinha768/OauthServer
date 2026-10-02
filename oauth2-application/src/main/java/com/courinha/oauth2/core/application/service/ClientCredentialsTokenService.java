@@ -84,7 +84,7 @@ public final class ClientCredentialsTokenService implements IssueClientCredentia
 
         Client client = authenticate(command);
 
-        GrantType grantType = GrantType.fromWire(command.grantType())
+        GrantType grantType = GrantType.fromWire(command.getGrantType())
                 .filter(SUPPORTED_GRANTS::contains)
                 .orElseThrow(OAuth2Exception::unsupportedGrantType);
 
@@ -92,16 +92,26 @@ public final class ClientCredentialsTokenService implements IssueClientCredentia
             throw OAuth2Exception.unauthorizedClient();
         }
 
-        ScopeSet granted = ScopePolicy.resolve(client, requestedScopes(command.scope()));
+        ScopeSet granted = ScopePolicy.resolve(client, requestedScopes(command.getScope()));
 
         Instant issuedAt = clock.now();
         Instant expiresAt = issuedAt.plus(tokenLifetime.accessTokenTtl());
 
-        String value = accessTokenGenerator.generate(
-                new TokenGenerationRequest(client.id(), granted, issuedAt, expiresAt));
+        String value = accessTokenGenerator.generate(TokenGenerationRequest.builder()
+                .clientId(client.getId())
+                .scopes(granted)
+                .issuedAt(issuedAt)
+                .expiresAt(expiresAt)
+                .build());
 
-        AccessToken token =
-                new AccessToken(value, client.id(), granted, TokenType.BEARER, issuedAt, expiresAt);
+        AccessToken token = AccessToken.builder()
+                .value(value)
+                .clientId(client.getId())
+                .scopes(granted)
+                .tokenType(TokenType.BEARER)
+                .issuedAt(issuedAt)
+                .expiresAt(expiresAt)
+                .build();
 
         // Saved before returning, so an opaque token is resolvable the moment the client has it.
         accessTokenRepository.save(token);
@@ -109,7 +119,7 @@ public final class ClientCredentialsTokenService implements IssueClientCredentia
     }
 
     private static void requireGrantTypePresent(ClientCredentialsCommand command) {
-        if (command.grantType() == null || command.grantType().isBlank()) {
+        if (command.getGrantType() == null || command.getGrantType().isBlank()) {
             throw OAuth2Exception.invalidRequest("Missing required parameter: grant_type");
         }
     }
@@ -122,22 +132,22 @@ public final class ClientCredentialsTokenService implements IssueClientCredentia
      * {@code invalid_client} error with the same description, and does the same amount of work.
      */
     private Client authenticate(ClientCredentialsCommand command) {
-        String rawClientId = command.clientId();
-        String rawSecret = command.clientSecret() == null ? "" : command.clientSecret();
+        String rawClientId = command.getClientId();
+        String rawSecret = command.getClientSecret() == null ? "" : command.getClientSecret();
 
         Client client = (rawClientId == null || rawClientId.isBlank())
                 ? null
                 : clientRepository.findByClientId(new ClientId(rawClientId)).orElse(null);
 
-        SecretHash hashToCheck = (client != null && client.secretHash() != null)
-                ? client.secretHash()
+        SecretHash hashToCheck = (client != null && client.getSecretHash() != null)
+                ? client.getSecretHash()
                 : TIMING_EQUALISATION_HASH;
         boolean secretMatches = clientSecretHasher.matches(rawSecret, hashToCheck);
 
         if (client == null
                 || !secretMatches
                 || !client.isConfidential()
-                || !client.authenticatesWith(command.presentedMethod())) {
+                || !client.authenticatesWith(command.getPresentedMethod())) {
             throw OAuth2Exception.invalidClient();
         }
         return client;

@@ -1,5 +1,7 @@
 package com.courinha.oauth2.core.domain.client;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -11,6 +13,7 @@ import java.util.Optional;
  * client registrations name them, and a registration must be able to express a grant the server
  * will later refuse with {@code unauthorized_client} rather than fail to parse.
  */
+@Getter
 public enum GrantType {
 
     AUTHORIZATION_CODE("authorization_code"),
@@ -23,10 +26,6 @@ public enum GrantType {
 
     GrantType(String wireValue) {
         this.wireValue = wireValue;
-    }
-
-    public String wireValue() {
-        return wireValue;
     }
 
     /**

@@ -1,5 +1,9 @@
 package com.courinha.oauth2.core.domain.client;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
 /**
@@ -9,13 +13,19 @@ import java.util.Objects;
  * registered client's secret in the clear, and {@link #toString()} is redacted so an accidental
  * log statement cannot leak one.
  */
-public record SecretHash(String value) {
+@Data
+@NoArgsConstructor
+public class SecretHash {
 
-    public SecretHash {
+    private String value;
+
+    @Builder
+    public SecretHash(String value) {
         Objects.requireNonNull(value, "value");
         if (value.isBlank()) {
             throw new IllegalArgumentException("A secret hash must not be blank");
         }
+        this.value = value;
     }
 
     /** Always redacted: this is the one type whose contents must never reach a log. */

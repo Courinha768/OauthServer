@@ -63,7 +63,7 @@ class ClientTest {
                 TokenEndpointAuthMethod.NONE);
 
         assertThat(client.isConfidential()).isFalse();
-        assertThat(client.secretHash()).isNull();
+        assertThat(client.getSecretHash()).isNull();
     }
 
     @Test
@@ -74,7 +74,7 @@ class ClientTest {
                 TokenEndpointAuthMethod.CLIENT_SECRET_BASIC);
         source.add(GrantType.PASSWORD);
 
-        assertThat(client.grantTypes()).containsExactly(GrantType.CLIENT_CREDENTIALS);
+        assertThat(client.getGrantTypes()).containsExactly(GrantType.CLIENT_CREDENTIALS);
     }
 
     @Test

@@ -32,6 +32,6 @@ public final class BCryptClientSecretHasher implements ClientSecretHasher {
         if (rawSecret == null || storedHash == null) {
             return false;
         }
-        return encoder.matches(rawSecret, storedHash.value());
+        return encoder.matches(rawSecret, storedHash.getValue());
     }
 }

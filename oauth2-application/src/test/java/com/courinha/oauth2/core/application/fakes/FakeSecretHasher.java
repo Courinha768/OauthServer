@@ -27,7 +27,7 @@ public final class FakeSecretHasher implements ClientSecretHasher {
     @Override
     public boolean matches(String rawSecret, SecretHash storedHash) {
         matchCalls.add(storedHash);
-        return storedHash != null && storedHash.value().equals(HASH_PREFIX + rawSecret);
+        return storedHash != null && storedHash.getValue().equals(HASH_PREFIX + rawSecret);
     }
 
     /** How many comparisons have been attempted. */

@@ -1,5 +1,9 @@
 package com.courinha.oauth2.core.domain.scope;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
 /**
@@ -10,11 +14,18 @@ import java.util.Objects;
  * {@code "} (x22) and {@code \} (x5C), and admits no control characters or non-ASCII. Scope
  * tokens are case-sensitive, so {@code Read} and {@code read} are different scopes.
  */
-public record Scope(String value) {
+@Data
+@NoArgsConstructor
+public class Scope {
 
-    public Scope {
+    private String value;
+
+    /** Validates on construction; the generated setter assigns directly, as Lombok setters do. */
+    @Builder
+    public Scope(String value) {
         Objects.requireNonNull(value, "value");
         requireValidToken(value);
+        this.value = value;
     }
 
     private static void requireValidToken(String value) {

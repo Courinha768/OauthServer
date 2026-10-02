@@ -12,17 +12,17 @@ public class OAuth2Exception extends RuntimeException {
     private final transient OAuth2Error error;
 
     public OAuth2Exception(OAuth2Error error) {
-        super(error.code().wireValue()
-                + (error.description() == null ? "" : ": " + error.description()));
+        super(error.getCode().getWireValue()
+                + (error.getDescription() == null ? "" : ": " + error.getDescription()));
         this.error = error;
     }
 
-    public OAuth2Error error() {
+    public OAuth2Error getError() {
         return error;
     }
 
-    public OAuth2ErrorCode code() {
-        return error.code();
+    public OAuth2ErrorCode getCode() {
+        return error.getCode();
     }
 
     /** The request is malformed, or missing a required parameter. */

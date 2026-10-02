@@ -19,7 +19,7 @@ public final class InMemoryAccessTokenRepository implements AccessTokenRepositor
 
     @Override
     public void save(AccessToken token) {
-        tokens.put(token.value(), token);
+        tokens.put(token.getValue(), token);
     }
 
     public Optional<AccessToken> findByValue(String value) {

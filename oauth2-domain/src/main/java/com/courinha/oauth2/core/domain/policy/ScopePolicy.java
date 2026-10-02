@@ -27,9 +27,9 @@ public final class ScopePolicy {
      */
     public static ScopeSet resolve(Client client, ScopeSet requested) {
         if (requested.isEmpty()) {
-            return client.registeredScopes();
+            return client.getRegisteredScopes();
         }
-        if (!client.registeredScopes().containsAll(requested)) {
+        if (!client.getRegisteredScopes().containsAll(requested)) {
             throw OAuth2Exception.invalidScope();
         }
         return requested;

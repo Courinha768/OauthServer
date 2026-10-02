@@ -6,7 +6,6 @@ import com.courinha.oauth2.core.application.fakes.FakeSecretHasher;
 import com.courinha.oauth2.core.application.fakes.RecordingAccessTokenRepository;
 import com.courinha.oauth2.core.application.fakes.StubAccessTokenGenerator;
 import com.courinha.oauth2.core.application.port.in.ClientCredentialsCommand;
-import com.courinha.oauth2.core.application.port.out.TokenLifetimePort;
 import com.courinha.oauth2.core.domain.client.Client;
 import com.courinha.oauth2.core.domain.client.ClientId;
 import com.courinha.oauth2.core.domain.client.ClientType;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumSet;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,13 +54,14 @@ class ClientCredentialsTokenServiceTest {
     }
 
     private static Client clientRegisteredFor(GrantType... grants) {
-        return new Client(
-                DEMO_ID,
-                new FakeSecretHasher().hash(CORRECT_SECRET),
-                ClientType.CONFIDENTIAL,
-                EnumSet.copyOf(java.util.List.of(grants)),
-                ScopeSet.of("read", "write"),
-                TokenEndpointAuthMethod.CLIENT_SECRET_BASIC);
+        return Client.builder()
+                .id(DEMO_ID)
+                .secretHash(new FakeSecretHasher().hash(CORRECT_SECRET))
+                .type(ClientType.CONFIDENTIAL)
+                .grantTypes(EnumSet.copyOf(List.of(grants)))
+                .registeredScopes(ScopeSet.of("read", "write"))
+                .authMethod(TokenEndpointAuthMethod.CLIENT_SECRET_BASIC)
+                .build();
     }
 
     private ClientCredentialsTokenService serviceFor(Client... clients) {
@@ -73,8 +74,13 @@ class ClientCredentialsTokenServiceTest {
     }
 
     private static ClientCredentialsCommand command(String clientId, String secret, String grantType, String scope) {
-        return new ClientCredentialsCommand(
-                clientId, secret, TokenEndpointAuthMethod.CLIENT_SECRET_BASIC, grantType, scope);
+        return ClientCredentialsCommand.builder()
+                .clientId(clientId)
+                .clientSecret(secret)
+                .presentedMethod(TokenEndpointAuthMethod.CLIENT_SECRET_BASIC)
+                .grantType(grantType)
+                .scope(scope)
+                .build();
     }
 
     private static OAuth2Exception assertFailsWith(ClientCredentialsTokenService service,
@@ -82,7 +88,7 @@ class ClientCredentialsTokenServiceTest {
                                                    OAuth2ErrorCode expected) {
         OAuth2Exception thrown = catchThrowableOfType(() -> service.issue(command), OAuth2Exception.class);
         assertThat(thrown).isNotNull();
-        assertThat(thrown.code()).isEqualTo(expected);
+        assertThat(thrown.getCode()).isEqualTo(expected);
         return thrown;
     }
 
@@ -94,12 +100,12 @@ class ClientCredentialsTokenServiceTest {
             AccessToken token = serviceFor(demoClient())
                     .issue(command("demo", CORRECT_SECRET, "client_credentials", "read"));
 
-            assertThat(token.value()).isEqualTo("opaque-abc123");
-            assertThat(token.clientId()).isEqualTo(DEMO_ID);
-            assertThat(token.tokenType()).isEqualTo(TokenType.BEARER);
-            assertThat(token.scopes().asSpaceDelimited()).isEqualTo("read");
-            assertThat(token.issuedAt()).isEqualTo(NOW);
-            assertThat(token.expiresAt()).isEqualTo(NOW.plus(TTL));
+            assertThat(token.getValue()).isEqualTo("opaque-abc123");
+            assertThat(token.getClientId()).isEqualTo(DEMO_ID);
+            assertThat(token.getTokenType()).isEqualTo(TokenType.BEARER);
+            assertThat(token.getScopes().asSpaceDelimited()).isEqualTo("read");
+            assertThat(token.getIssuedAt()).isEqualTo(NOW);
+            assertThat(token.getExpiresAt()).isEqualTo(NOW.plus(TTL));
             assertThat(token.expiresInSeconds()).isEqualTo(3600);
         }
 
@@ -108,7 +114,7 @@ class ClientCredentialsTokenServiceTest {
             serviceFor(demoClient()).issue(command("demo", CORRECT_SECRET, "client_credentials", "read"));
 
             assertThat(tokenRepository.saveCount()).isEqualTo(1);
-            assertThat(tokenRepository.lastSaved().value()).isEqualTo("opaque-abc123");
+            assertThat(tokenRepository.lastSaved().getValue()).isEqualTo("opaque-abc123");
         }
 
         @Test
@@ -116,7 +122,7 @@ class ClientCredentialsTokenServiceTest {
             AccessToken token = serviceFor(demoClient())
                     .issue(command("demo", CORRECT_SECRET, "client_credentials", null));
 
-            assertThat(token.scopes().asSpaceDelimited()).isEqualTo("read write");
+            assertThat(token.getScopes().asSpaceDelimited()).isEqualTo("read write");
         }
 
         @Test
@@ -124,10 +130,10 @@ class ClientCredentialsTokenServiceTest {
             serviceFor(demoClient()).issue(command("demo", CORRECT_SECRET, "client_credentials", "read"));
 
             var request = generator.lastRequest();
-            assertThat(request.clientId()).isEqualTo(DEMO_ID);
-            assertThat(request.scopes().asSpaceDelimited()).isEqualTo("read");
-            assertThat(request.issuedAt()).isEqualTo(NOW);
-            assertThat(request.expiresAt()).isEqualTo(NOW.plus(TTL));
+            assertThat(request.getClientId()).isEqualTo(DEMO_ID);
+            assertThat(request.getScopes().asSpaceDelimited()).isEqualTo("read");
+            assertThat(request.getIssuedAt()).isEqualTo(NOW);
+            assertThat(request.getExpiresAt()).isEqualTo(NOW.plus(TTL));
         }
     }
 
@@ -140,7 +146,7 @@ class ClientCredentialsTokenServiceTest {
                     command("demo", "wrong", "client_credentials", null),
                     OAuth2ErrorCode.INVALID_CLIENT);
 
-            assertThat(tokenRepository.saveCount()).isZero();
+            assertThat(tokenRepository.hasSavedAnything()).isFalse();
             assertThat(generator.callCount()).isZero();
         }
 
@@ -154,8 +160,10 @@ class ClientCredentialsTokenServiceTest {
         @Test
         void rejectsMissingCredentials() {
             assertFailsWith(serviceFor(demoClient()),
-                    new ClientCredentialsCommand(null, null, TokenEndpointAuthMethod.NONE,
-                            "client_credentials", null),
+                    ClientCredentialsCommand.builder()
+                            .presentedMethod(TokenEndpointAuthMethod.NONE)
+                            .grantType("client_credentials")
+                            .build(),
                     OAuth2ErrorCode.INVALID_CLIENT);
         }
 
@@ -164,20 +172,31 @@ class ClientCredentialsTokenServiceTest {
             // Registered for Basic only. The server supports POST, so this is an authentication
             // failure rather than an invalid_request.
             assertFailsWith(serviceFor(demoClient()),
-                    new ClientCredentialsCommand("demo", CORRECT_SECRET,
-                            TokenEndpointAuthMethod.CLIENT_SECRET_POST, "client_credentials", null),
+                    ClientCredentialsCommand.builder()
+                            .clientId("demo")
+                            .clientSecret(CORRECT_SECRET)
+                            .presentedMethod(TokenEndpointAuthMethod.CLIENT_SECRET_POST)
+                            .grantType("client_credentials")
+                            .build(),
                     OAuth2ErrorCode.INVALID_CLIENT);
         }
 
         @Test
         void rejectsAPublicClient() {
-            Client publicClient = new Client(new ClientId("spa"), null, ClientType.PUBLIC,
-                    EnumSet.of(GrantType.CLIENT_CREDENTIALS), ScopeSet.of("read"),
-                    TokenEndpointAuthMethod.NONE);
+            Client publicClient = Client.builder()
+                    .id(new ClientId("spa"))
+                    .type(ClientType.PUBLIC)
+                    .grantTypes(EnumSet.of(GrantType.CLIENT_CREDENTIALS))
+                    .registeredScopes(ScopeSet.of("read"))
+                    .authMethod(TokenEndpointAuthMethod.NONE)
+                    .build();
 
             assertFailsWith(serviceFor(publicClient),
-                    new ClientCredentialsCommand("spa", null, TokenEndpointAuthMethod.NONE,
-                            "client_credentials", null),
+                    ClientCredentialsCommand.builder()
+                            .clientId("spa")
+                            .presentedMethod(TokenEndpointAuthMethod.NONE)
+                            .grantType("client_credentials")
+                            .build(),
                     OAuth2ErrorCode.INVALID_CLIENT);
         }
 
@@ -190,8 +209,8 @@ class ClientCredentialsTokenServiceTest {
                     command("demo", "wrong", "client_credentials", null),
                     OAuth2ErrorCode.INVALID_CLIENT);
 
-            assertThat(unknownClient.error().description())
-                    .isEqualTo(wrongSecret.error().description());
+            assertThat(unknownClient.getError().getDescription())
+                    .isEqualTo(wrongSecret.getError().getDescription());
         }
 
         @Test
@@ -249,9 +268,14 @@ class ClientCredentialsTokenServiceTest {
 
         @Test
         void rejectsAClientNotRegisteredForTheGrant() {
-            Client noGrant = new Client(DEMO_ID, new FakeSecretHasher().hash(CORRECT_SECRET),
-                    ClientType.CONFIDENTIAL, EnumSet.of(GrantType.AUTHORIZATION_CODE),
-                    ScopeSet.of("read"), TokenEndpointAuthMethod.CLIENT_SECRET_BASIC);
+            Client noGrant = Client.builder()
+                    .id(DEMO_ID)
+                    .secretHash(new FakeSecretHasher().hash(CORRECT_SECRET))
+                    .type(ClientType.CONFIDENTIAL)
+                    .grantTypes(EnumSet.of(GrantType.AUTHORIZATION_CODE))
+                    .registeredScopes(ScopeSet.of("read"))
+                    .authMethod(TokenEndpointAuthMethod.CLIENT_SECRET_BASIC)
+                    .build();
 
             assertFailsWith(serviceFor(noGrant),
                     command("demo", CORRECT_SECRET, "client_credentials", null),
@@ -280,7 +304,7 @@ class ClientCredentialsTokenServiceTest {
                     command("demo", CORRECT_SECRET, "client_credentials", "read admin"),
                     OAuth2ErrorCode.INVALID_SCOPE);
 
-            assertThat(tokenRepository.saveCount()).isZero();
+            assertThat(tokenRepository.hasSavedAnything()).isFalse();
             assertThat(generator.callCount()).isZero();
         }
 
@@ -312,7 +336,7 @@ class ClientCredentialsTokenServiceTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("signing key unavailable");
 
-            assertThat(tokenRepository.saveCount()).isZero();
+            assertThat(tokenRepository.hasSavedAnything()).isFalse();
         }
 
         @Test
@@ -342,11 +366,5 @@ class ClientCredentialsTokenServiceTest {
         assertThat(command("demo", "super-secret", "client_credentials", null).toString())
                 .doesNotContain("super-secret")
                 .contains("REDACTED");
-    }
-
-    @Test
-    void lifetimePortIsUsedRatherThanAConstant() {
-        TokenLifetimePort port = () -> Duration.ofSeconds(42);
-        assertThat(port.accessTokenTtl()).isEqualTo(Duration.ofSeconds(42));
     }
 }

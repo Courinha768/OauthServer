@@ -4,7 +4,8 @@ import com.courinha.oauth2.core.domain.client.ClientId;
 import com.courinha.oauth2.core.domain.scope.ScopeSet;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.RecordComponent;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
@@ -19,22 +20,30 @@ class AccessTokenTest {
     private static final Instant ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z");
 
     private static AccessToken token() {
-        return new AccessToken("t-123", CLIENT_ID, ScopeSet.of("read"), TokenType.BEARER,
-                ISSUED_AT, ISSUED_AT.plusSeconds(3600));
+        return AccessToken.builder()
+                .value("t-123")
+                .clientId(CLIENT_ID)
+                .scopes(ScopeSet.of("read"))
+                .tokenType(TokenType.BEARER)
+                .issuedAt(ISSUED_AT)
+                .expiresAt(ISSUED_AT.plusSeconds(3600))
+                .build();
     }
 
     /**
      * RFC 6749 §4.4.3 says a refresh token SHOULD NOT accompany a client credentials response.
-     * Asserting the record's shape means that if someone later adds a {@code refreshToken}
-     * component, this fails loudly instead of the rule quietly eroding.
+     * Asserting the field set means that if someone later adds a {@code refreshToken} field,
+     * this fails loudly instead of the rule quietly eroding.
      */
     @Test
     void modelsNoRefreshToken() {
-        Set<String> components = Arrays.stream(AccessToken.class.getRecordComponents())
-                .map(RecordComponent::getName)
+        Set<String> fields = Arrays.stream(AccessToken.class.getDeclaredFields())
+                .filter(field -> !field.isSynthetic())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .map(Field::getName)
                 .collect(Collectors.toSet());
 
-        assertThat(components).containsExactlyInAnyOrder(
+        assertThat(fields).containsExactlyInAnyOrder(
                 "value", "clientId", "scopes", "tokenType", "issuedAt", "expiresAt");
     }
 
@@ -59,17 +68,35 @@ class AccessTokenTest {
     }
 
     @Test
+    void isComparableByValue() {
+        assertThat(token()).isEqualTo(token());
+        assertThat(token()).hasSameHashCodeAs(token());
+    }
+
+    @Test
     void rejectsALifetimeThatDoesNotAdvance() {
-        assertThatThrownBy(() -> new AccessToken("t", CLIENT_ID, ScopeSet.empty(), TokenType.BEARER,
-                ISSUED_AT, ISSUED_AT))
+        assertThatThrownBy(() -> AccessToken.builder()
+                .value("t")
+                .clientId(CLIENT_ID)
+                .scopes(ScopeSet.empty())
+                .tokenType(TokenType.BEARER)
+                .issuedAt(ISSUED_AT)
+                .expiresAt(ISSUED_AT)
+                .build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("expiresAt must be after issuedAt");
     }
 
     @Test
     void rejectsABlankValue() {
-        assertThatThrownBy(() -> new AccessToken(" ", CLIENT_ID, ScopeSet.empty(), TokenType.BEARER,
-                ISSUED_AT, ISSUED_AT.plusSeconds(60)))
+        assertThatThrownBy(() -> AccessToken.builder()
+                .value(" ")
+                .clientId(CLIENT_ID)
+                .scopes(ScopeSet.empty())
+                .tokenType(TokenType.BEARER)
+                .issuedAt(ISSUED_AT)
+                .expiresAt(ISSUED_AT.plusSeconds(60))
+                .build())
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

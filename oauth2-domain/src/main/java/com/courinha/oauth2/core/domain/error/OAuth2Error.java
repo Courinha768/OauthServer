@@ -1,18 +1,35 @@
 package com.courinha.oauth2.core.domain.error;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
 /**
  * An RFC 6749 §5.2 error response, minus its transport. {@code description} and {@code errorUri}
  * are optional.
- *
- * @param code        the error code, always present
- * @param description human-readable detail, or {@code null}
- * @param errorUri    a URI identifying the error, or {@code null}
  */
-public record OAuth2Error(OAuth2ErrorCode code, String description, String errorUri) {
+@Data
+@NoArgsConstructor
+@Builder
+public class OAuth2Error {
 
-    public OAuth2Error {
+    private OAuth2ErrorCode code;
+
+    /** Human-readable detail, or {@code null}. */
+    private String description;
+
+    /** A URI identifying the error, or {@code null}. */
+    private String errorUri;
+
+    /**
+     * Validates on construction, so an error can never be built that the RFC forbids sending.
+     * Note that the generated setters assign directly and do not re-check; the constructor is
+     * the validated entry point.
+     */
+    @Builder
+    public OAuth2Error(OAuth2ErrorCode code, String description, String errorUri) {
         Objects.requireNonNull(code, "code");
         if (description != null) {
             requirePermittedCharacters(description, true, "error_description");
@@ -20,6 +37,9 @@ public record OAuth2Error(OAuth2ErrorCode code, String description, String error
         if (errorUri != null) {
             requirePermittedCharacters(errorUri, false, "error_uri");
         }
+        this.code = code;
+        this.description = description;
+        this.errorUri = errorUri;
     }
 
     public static OAuth2Error of(OAuth2ErrorCode code) {

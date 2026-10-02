@@ -97,7 +97,40 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!--
+                      Declared explicitly rather than relying on classpath discovery:
+                      javac no longer runs annotation processors found on the classpath
+                      by default on recent JDKs.
+                    -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
+        <!--
+          provided scope: Lombok is a compile-time annotation processor and must not
+          reach the runtime classpath or the repackaged boot jar.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!--
           JUnit 5 is inherited by every module, including oauth2-domain and
           oauth2-application, which is what lets the inner hexagon be tested

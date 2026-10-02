@@ -45,18 +45,18 @@ class OAuth2ErrorTest {
     void descriptionAndUriAreOptional() {
         OAuth2Error error = OAuth2Error.of(OAuth2ErrorCode.INVALID_SCOPE);
 
-        assertThat(error.description()).isNull();
-        assertThat(error.errorUri()).isNull();
+        assertThat(error.getDescription()).isNull();
+        assertThat(error.getErrorUri()).isNull();
     }
 
     @Test
     void wireValuesMatchTheRfcSpelling() {
-        assertThat(OAuth2ErrorCode.INVALID_REQUEST.wireValue()).isEqualTo("invalid_request");
-        assertThat(OAuth2ErrorCode.INVALID_CLIENT.wireValue()).isEqualTo("invalid_client");
-        assertThat(OAuth2ErrorCode.INVALID_GRANT.wireValue()).isEqualTo("invalid_grant");
-        assertThat(OAuth2ErrorCode.UNAUTHORIZED_CLIENT.wireValue()).isEqualTo("unauthorized_client");
-        assertThat(OAuth2ErrorCode.UNSUPPORTED_GRANT_TYPE.wireValue()).isEqualTo("unsupported_grant_type");
-        assertThat(OAuth2ErrorCode.INVALID_SCOPE.wireValue()).isEqualTo("invalid_scope");
+        assertThat(OAuth2ErrorCode.INVALID_REQUEST.getWireValue()).isEqualTo("invalid_request");
+        assertThat(OAuth2ErrorCode.INVALID_CLIENT.getWireValue()).isEqualTo("invalid_client");
+        assertThat(OAuth2ErrorCode.INVALID_GRANT.getWireValue()).isEqualTo("invalid_grant");
+        assertThat(OAuth2ErrorCode.UNAUTHORIZED_CLIENT.getWireValue()).isEqualTo("unauthorized_client");
+        assertThat(OAuth2ErrorCode.UNSUPPORTED_GRANT_TYPE.getWireValue()).isEqualTo("unsupported_grant_type");
+        assertThat(OAuth2ErrorCode.INVALID_SCOPE.getWireValue()).isEqualTo("invalid_scope");
     }
 
     /**
