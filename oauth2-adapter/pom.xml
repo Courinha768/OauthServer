@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.courinha.oauth</groupId>
+        <artifactId>oauth2-core</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oauth2-adapter</artifactId>
+    <name>oauth2-adapter</name>
+    <description>Driving (web) and driven (persistence, crypto, token) adapters around the application ports.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-application</artifactId>
+        </dependency>
+
+        <!-- Driving adapter: the RFC 6749 token endpoint is a plain WebMVC controller. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+
+        <!-- Driven adapter: BCrypt for client secrets, without pulling in Spring Security proper. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <!-- Driven adapter: JSON for the hand-rolled HS256 JWT (Jackson 3 in Boot 4). -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
