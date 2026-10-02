@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.courinha.oauth</groupId>
+        <artifactId>oauth2-adapter</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oauth2-adapter-out-persistence-file</artifactId>
+    <name>oauth2-adapter-out-persistence-file</name>
+    <description>Driven adapter: file-backed client and access token repositories.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-application</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!--
+          Only for @ConfigurationProperties on FileConfigs, so that Boot binds and validates the
+          paths. The core artifact is enough; no starter is needed for an annotation.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

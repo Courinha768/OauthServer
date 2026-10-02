@@ -1,5 +1,9 @@
 HELP.md
 target/
+
+### File persistence (oauth2-adapter-out-persistence-file) ###
+# access-tokens.json holds live credentials in the clear; never commit it.
+/data/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

@@ -30,6 +30,7 @@ Each module has its own README.
 |---|---|
 | [in-web](oauth2-adapter/oauth2-adapter-in-web/README.md) | The token endpoint, over plain Spring WebMVC. |
 | [out-persistence-inmemory](oauth2-adapter/oauth2-adapter-out-persistence-inmemory/README.md) | Map-backed client and token repositories. |
+| [out-persistence-file](oauth2-adapter/oauth2-adapter-out-persistence-file/README.md) | The same repositories, backed by JSON files. |
 | [out-token-opaque](oauth2-adapter/oauth2-adapter-out-token-opaque/README.md) | Random opaque access tokens. |
 | [out-token-jwt](oauth2-adapter/oauth2-adapter-out-token-jwt/README.md) | Self-contained HS256 JWTs, hand-rolled on the JDK. |
 | [out-secret-bcrypt](oauth2-adapter/oauth2-adapter-out-secret-bcrypt/README.md) | BCrypt client secret hashing. |
@@ -65,6 +66,11 @@ Two demo clients are seeded at startup: `demo-basic` (registered for `client_sec
 `demo-post` (registered for `client_secret_post`), both with secret `secret`. A third,
 `demo-special`, has a secret full of characters that require RFC 6749 Appendix B encoding.
 
+To run against the file-backed repositories instead, set
+`oauth2.persistence.repository=file`. That registry starts empty — the file is the operator's
+source of truth — so either add a client to `clients.json` or set
+`oauth2.file.persistence.seed-demo-clients=true` for the first run.
+
 ## Try it
 
 ```bash
@@ -86,6 +92,10 @@ curl -si -u demo-basic:wrong -d "grant_type=client_credentials" \
 
 | Property | Default | Meaning |
 |---|---|---|
+| `oauth2.persistence.repository` | `inmemory` | `inmemory` or `file` |
+| `oauth2.file.persistence.clients-file-path` | `./data/clients.json` | Only when the repository is `file` |
+| `oauth2.file.persistence.access-tokens-file-path` | `./data/access-tokens.json` | Only when the repository is `file` |
+| `oauth2.file.persistence.seed-demo-clients` | `false` | Seed the demo clients into an empty clients file |
 | `oauth2.token.format` | `opaque` | `opaque` or `jwt` |
 | `oauth2.token.access-token-ttl` | `PT1H` | Token lifetime, ISO-8601 duration |
 | `oauth2.jwt.issuer` | `https://localhost:8080` | The `iss` claim |

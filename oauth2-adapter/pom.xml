@@ -19,6 +19,7 @@
 
     <modules>
         <module>oauth2-adapter-in-web</module>
+        <module>oauth2-adapter-out-persistence-file</module>
         <module>oauth2-adapter-out-persistence-inmemory</module>
         <module>oauth2-adapter-out-token-opaque</module>
         <module>oauth2-adapter-out-token-jwt</module>

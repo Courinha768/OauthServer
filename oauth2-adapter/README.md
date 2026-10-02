@@ -11,6 +11,7 @@ Every adapter is its own module, so a deployment picks exactly the ones it wants
 |---|---|
 | [oauth2-adapter-in-web](oauth2-adapter-in-web/README.md) | drives `IssueClientCredentialsTokenUseCase` |
 | [oauth2-adapter-out-persistence-inmemory](oauth2-adapter-out-persistence-inmemory/README.md) | `ClientRepository`, `AccessTokenRepository` |
+| [oauth2-adapter-out-persistence-file](oauth2-adapter-out-persistence-file/README.md) | `ClientRepository`, `AccessTokenRepository` |
 | [oauth2-adapter-out-token-opaque](oauth2-adapter-out-token-opaque/README.md) | `AccessTokenGenerator` |
 | [oauth2-adapter-out-token-jwt](oauth2-adapter-out-token-jwt/README.md) | `AccessTokenGenerator` |
 | [oauth2-adapter-out-secret-bcrypt](oauth2-adapter-out-secret-bcrypt/README.md) | `ClientSecretHasher` |

@@ -2,13 +2,18 @@ package com.courinha.oauth2.core.config;
 
 import com.courinha.oauth2.core.adapter.out.persistence.inmemory.InMemoryAccessTokenRepository;
 import com.courinha.oauth2.core.adapter.out.persistence.inmemory.InMemoryClientRepository;
+import com.courinha.oauth2.core.adapter.out.persistence.file.FileAccessTokenRepository;
+import com.courinha.oauth2.core.adapter.out.persistence.file.FileClientRepository;
+import com.courinha.oauth2.core.adapter.out.persistence.file.FileConfigs;
 import com.courinha.oauth2.core.adapter.out.policy.fixed.FixedTokenLifetimeAdapter;
 import com.courinha.oauth2.core.adapter.out.secret.bcrypt.BCryptClientSecretHasher;
 import com.courinha.oauth2.core.adapter.out.time.system.SystemClockAdapter;
 import com.courinha.oauth2.core.application.port.out.AccessTokenRepository;
+import com.courinha.oauth2.core.application.port.out.ClientRepository;
 import com.courinha.oauth2.core.application.port.out.ClientSecretHasher;
 import com.courinha.oauth2.core.application.port.out.ClockPort;
 import com.courinha.oauth2.core.application.port.out.TokenLifetimePort;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,13 +32,27 @@ import org.springframework.context.annotation.Configuration;
 public class AdapterWiringConfiguration {
 
     @Bean
+    @ConditionalOnProperty(prefix = "oauth2.persistence", name = "repository", havingValue = "inmemory", matchIfMissing = true)
     public InMemoryClientRepository inMemoryClientRepository() {
         return new InMemoryClientRepository();
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "oauth2.persistence", name = "repository", havingValue = "file")
+    public ClientRepository fileClientRepository(FileConfigs configs) {
+        return new FileClientRepository(configs);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "oauth2.persistence", name = "repository", havingValue = "inmemory", matchIfMissing = true)
     public AccessTokenRepository accessTokenRepository() {
         return new InMemoryAccessTokenRepository();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "oauth2.persistence", name = "repository", havingValue = "file")
+    public AccessTokenRepository fileAccessTokenRepository(FileConfigs configs) {
+        return new FileAccessTokenRepository(configs);
     }
 
     @Bean

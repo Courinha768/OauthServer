@@ -10,7 +10,7 @@ the classpath. It depends on every adapter, so it is where the mix-and-match dec
 | Class | Responsibility |
 |---|---|
 | `Oauth2CoreApplication` | The `@SpringBootApplication`. |
-| `AdapterWiringConfiguration` | Binds driven adapters to the ports they implement. |
+| `AdapterWiringConfiguration` | Binds driven adapters to the ports they implement, selecting persistence from `oauth2.persistence.repository`. |
 | `TokenGeneratorConfiguration` | Chooses the token format from configuration. |
 | `UseCaseWiringConfiguration` | Assembles the use case from its ports. |
 | `ClientSeedConfiguration` | Seeds the demo clients. |
@@ -28,11 +28,23 @@ which implementation was chosen. Both token generator modules are on the classpa
 ## Configuration
 
 ```properties
+oauth2.persistence.repository=inmemory   # or file
+oauth2.file.persistence.clients-file-path=./data/clients.json
+oauth2.file.persistence.access-tokens-file-path=./data/access-tokens.json
+oauth2.file.persistence.seed-demo-clients=false
+
 oauth2.token.format=opaque            # or jwt
 oauth2.token.access-token-ttl=PT1H
 oauth2.jwt.issuer=https://localhost:8080
 oauth2.jwt.hmac-secret=${OAUTH2_JWT_SECRET:dev-only-insecure-secret-change-me-32b}
 ```
+
+Persistence is a runtime choice for the same reason the token format is: both adapters are on the
+classpath and `oauth2.persistence.repository` picks between them. The demo clients are seeded into
+the in-memory store automatically, but into the file store only when
+`oauth2.file.persistence.seed-demo-clients=true`, since that file is the operator's source of
+truth — see
+[out-persistence-file](../oauth2-adapter/oauth2-adapter-out-persistence-file/README.md).
 
 The `hmac-secret` default is for development only. Supply `OAUTH2_JWT_SECRET` in any real
 deployment; it must be at least 256 bits, which the codec enforces at startup.

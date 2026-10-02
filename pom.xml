@@ -76,6 +76,11 @@
             </dependency>
             <dependency>
                 <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-persistence-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
                 <artifactId>oauth2-adapter-out-token-opaque</artifactId>
                 <version>${project.version}</version>
             </dependency>
