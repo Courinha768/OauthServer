@@ -55,9 +55,43 @@
                 <artifactId>oauth2-application</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!--
+              Each adapter is version-managed individually so that oauth2-boot can depend on
+              exactly the ones it wants and leave the rest off the classpath entirely.
+            -->
             <dependency>
                 <groupId>com.courinha.oauth</groupId>
-                <artifactId>oauth2-adapter</artifactId>
+                <artifactId>oauth2-adapter-in-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-persistence-inmemory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-token-opaque</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-token-jwt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-secret-bcrypt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-time-system</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.courinha.oauth</groupId>
+                <artifactId>oauth2-adapter-out-policy-fixed-lifetime</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

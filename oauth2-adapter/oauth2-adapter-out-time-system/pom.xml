@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.courinha.oauth</groupId>
+        <artifactId>oauth2-adapter</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oauth2-adapter-out-time-system</artifactId>
+    <name>oauth2-adapter-out-time-system</name>
+    <description>Driven adapter: the system clock. The only place that reads wall-clock time.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-application</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

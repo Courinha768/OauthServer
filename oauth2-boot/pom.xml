@@ -13,9 +13,41 @@
     <description>Spring Boot composition root: wires adapters to ports and starts the server.</description>
 
     <dependencies>
+        <!--
+          This is the mix-and-match point. Swapping an adapter is a change to this list and
+          nothing else: drop the in-memory repositories for a JPA module, or the opaque
+          generator for the JWT one, without touching domain or application code.
+
+          Both token generators are included here on purpose, so the format can be chosen at
+          runtime by configuration rather than at build time.
+        -->
         <dependency>
             <groupId>com.courinha.oauth</groupId>
-            <artifactId>oauth2-adapter</artifactId>
+            <artifactId>oauth2-adapter-in-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-persistence-inmemory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-token-opaque</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-token-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-secret-bcrypt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-time-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.courinha.oauth</groupId>
+            <artifactId>oauth2-adapter-out-policy-fixed-lifetime</artifactId>
         </dependency>
 
         <dependency>

@@ -9,32 +9,22 @@
     </parent>
 
     <artifactId>oauth2-adapter</artifactId>
+    <packaging>pom</packaging>
     <name>oauth2-adapter</name>
-    <description>Driving (web) and driven (persistence, crypto, token) adapters around the application ports.</description>
+    <description>
+        Aggregator for the adapters. Each adapter is its own artifact so that a deployment can
+        pick, for example, the JWT generator without the opaque one, or a database repository
+        without the in-memory one. oauth2-boot chooses by declaring dependencies.
+    </description>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.courinha.oauth</groupId>
-            <artifactId>oauth2-application</artifactId>
-        </dependency>
-
-        <!-- Driving adapter: the RFC 6749 token endpoint is a plain WebMVC controller. -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
-        </dependency>
-
-        <!-- Driven adapter: BCrypt for client secrets, without pulling in Spring Security proper. -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
-        </dependency>
-
-        <!-- Driven adapter: JSON for the hand-rolled HS256 JWT (Jackson 3 in Boot 4). -->
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>oauth2-adapter-in-web</module>
+        <module>oauth2-adapter-out-persistence-inmemory</module>
+        <module>oauth2-adapter-out-token-opaque</module>
+        <module>oauth2-adapter-out-token-jwt</module>
+        <module>oauth2-adapter-out-secret-bcrypt</module>
+        <module>oauth2-adapter-out-time-system</module>
+        <module>oauth2-adapter-out-policy-fixed-lifetime</module>
+    </modules>
 
 </project>
